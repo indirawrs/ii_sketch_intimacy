@@ -24,7 +24,7 @@ class Obscure {
     noStroke();
     colorMode(HSB);
     fill(random(255), 220, 250);
-    rect(random(0, x), random(0, y), random(0, w), w);
+    ellipse(random(0, x), random(0, y), random(0, w), w);
     popStyle();
   }
 }
