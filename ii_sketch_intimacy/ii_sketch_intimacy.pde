@@ -1,9 +1,14 @@
 /**
  Indira Ardolic from the library of
  Kinect Infrared sensing to trigger video + poetry
+ 
+The purpose of this applet is to read the data and see where the ellipse is at. 
+I plan to modify it to detect multiple blobs in the future. 
  **/
 
 PWindow win;  //multiwindows
+PVideo vid;  //multiwindows
+
 
 import gab.opencv.*;
 import java.awt.Rectangle;
@@ -19,19 +24,8 @@ float maxThresh = 573; //830;
 float avgX;
 float checkX = width;  //we check vids against this
 
-//POEM variables are below
-int signX = 50;
-int signY = 200;
-int signWid = 600;
-int signHgt = 650;
-StringList poem;
-PFont font;
-//boolean lines = false; //check where mouse is to advance the lines of the poem
-float timer = 0; 
-float a = 0.0;
-int appear = 10; //how long we want them to wait before it goes, prob should disappear after a while or something?
-
-//VIDEO variables are below
+ /*
+//VIDEO variables are below, i put them in PVideo tho
 Movie couchDr;
 Movie bedDr;
 int movieW = 400;
@@ -48,30 +42,24 @@ void movieEvent(Movie couchDr) {
 void bedDrEvent(Movie bedDr) {
   bedDr.read();
 }
-
+*/
 public void settings() {
-  size(1820, 980, P3D); //1024, 848, P3D);
+  size(620, 580, P3D); //1024, 848, P3D);
 }
 
 void setup() {
   win = new PWindow();  //multiwindow setup
-
+  vid = new PVideo();
 
   kinect = new KinectPV2(this);
   kinect.enableDepthImg(true);
   kinect.enableInfraredImg(true);
   kinect.enableInfraredLongExposureImg(true);
+  kinect.enableColorImg(true);  //we're gonna replace the video with this image
+
   kinect.init();
 
   img = createImage(2*kwidth, 2*kheight, RGB); //  img = createImage(kwidth, kheight, RGB);
-
-  //poem setup stuff is below
-  background(0);
-  poem = new StringList("IT  WAS BAD ENOUGH YOU HEARD", "ME SING IN THE SHOWER", "BUT THEN YOU HEARD", "ME SAY YOUR NAME IN MY SLEEP", "I'M STILL EMBARRASSED OVER", "HOW I WOKE UP AND INSTINCTIVELY", "SAID I LOVE YOU", "PLEASE DON'T JUDGE ME", "FOR KNOWING HOW I FEEL", "I PROMISE I WILL NEVER", "MAKE THAT MISTAKE AGAIN");
-  font = createFont("cityburn", 40);
-  textFont(font);
-  fill(0);
-  textAlign(CENTER);
 
   /*
 VIDEO CODE IS BELOW
@@ -112,41 +100,6 @@ void videoPlay() {
     obs2.display();
     obs3.display();
   }
-}
-
-/*
-  POETRY CODE IS BELOW
- */
-void timeAdvance() {
-  if (avgX < width/2) { // in future cases it'd be the ellipse tracker
-    timer += 1;
-    println("timer: " + timer);
-    if (timer >appear) {
-      a+= .5;
-      //the goal is to make the lines appear bit by bit, so maybe the fill opacity increases
-    }
-  } else {
-    timer = 0;
-    a = 0;
-    println("timer reset: " + timer);
-    fill(0); //this draws a rectangle over everything or replace w line by line
-    rect(0, 0, width, height);
-    //   rect(a, 10, 400, 500);
-  }
-
-  for (int i = 0; i < poem.size(); i++) {
-    String item = poem.get(i);
-    fill(random(10, 50), 0, 0, a);
-    text(item, 350, 360+40*i);  //timer value  can still be accessed anywhere
-  }
-}
-
-void lineByLine() { //not super important to have rectangle float down. 
-  pushStyle();
-  fill(255, 100, 50, 80); //orange sign
-  noStroke();
-  ellipse(random(signX, signWid), random(signY, signHgt), signWid-signX, signHgt-signY); //makes ellipses in the sign dimensions
-  popStyle();
 }
 
 void draw() {
@@ -196,17 +149,8 @@ void draw() {
   float avgY = (sumY / totalPixels)*2;
   fill(0, 0, 255);
   ellipse(avgX, avgY, 64, 64);
-  //poem stuff is here
-  pushStyle();
-  fill(255, 100, 50);  //sign bg
-  noStroke();
-  rect(signX, signY, signWid, signHgt);
-  popStyle();
 
-  //lineByLine();
-  timeAdvance();
-
-  //video stuff is here
+  //VIDEO stuff is here
   videoPlay();
   image(couchDr, 0, 0, movieW, movieH);
   image(bedDr, width/2, 0, movieW, movieH);

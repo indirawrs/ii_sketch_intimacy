@@ -6,7 +6,7 @@
 
 class Obscure {
   float x, y; // X-coordinate, y-coordinate
-  float w, h; // width and height
+  float w; // width and height
 
   // Constructor
   Obscure(float xpos, float ypos, float rwidth, float rheight) {
